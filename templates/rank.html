@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>排行榜</title>
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/metisMenu/metisMenu.min.css' %}" rel="stylesheet">
+</head>
+<body>
+<div id="wrapper" class="container">
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">排行榜</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        最后统计时间：2019年6月12日 12:00:00
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <div class="pull-left">
+                                        <label for="">玩家昵称：</label>
+                                        <input type="number" class="form-control" placeholder="请输入玩家昵称">&emsp;
+                                        <label for="">游戏名称：</label>
+                                        <input type="number" class="form-control" placeholder="请输入游戏名称">
+                                        <button class="btn btn-primary" id="search">搜索</button>
+                                    </div>
+                                </div>
+                                <div class="pull-right">
+                                    <button class="btn btn-primary" id="add-btn">添加排行</button>
+                                </div>
+                            </div>
+                        </div>
+                        <table width="100%" class="table table-striped table-bordered table-hover"
+                               id="dataTables-example">
+                            <thead>
+                            <tr>
+                                <th>名次</th>
+                                <th>玩家昵称</th>
+                                <th>游戏名称</th>
+                                <th>游戏时长</th>
+                                <th>游戏平台</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <input type="hidden" value="0" id="rank-pk">
+                            {% for rank in ranks %}
+                                <tr data-pk="{{ rank.pk }}">
+                                    <td class="center">{{ forloop.counter }}</td>
+                                    <td class="center nickname">{{ rank.nickname }}</td>
+                                    <td class="center game_name">{{ rank.game_name }}</td>
+                                    <td class="center duration">{{ rank.duration }}</td>
+                                    <td class="center platform">{{ rank.get_platform_display }}</td>
+                                    <td class="center">{{ rank.create_time }}</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-xs edit-btn">编辑</button>
+                                        <button class="btn btn-danger btn-xs delete-btn">删除</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="dataTables_paginate paging_simple_numbers dataTables_info">
+                                            <ul class="pagination">
+                                                <li class="paginate_button next" tabindex="-1">
+                                                    <div class="dataTables_info">第{{ current_page }}页 /
+                                                        共{{ num_pages }}页&emsp;第{{ start_number }} - {{ stop_number }}条
+                                                        / 共{{ total }}条
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="dataTables_paginate paging_simple_numbers">
+                                                    <ul class="pagination">
+                                                        <li class="paginate_button next" tabindex="-1">
+                                                            <a href="?p=1">首页</a>
+                                                        </li>
+                                                        {% if page_obj.has_previous %}
+                                                            <li>
+                                                                <a href="?p={{ page_obj.previous_page_number }}">&laquo;</a>
+                                                            </li>
+                                                        {% else %}
+                                                            <li class="disabled"><a
+                                                                    href="javascript:void(0);">&laquo;</a></li>
+                                                        {% endif %}
+                                                        {% if left_has_more %}
+                                                            <li class="disabled"><a href="javascript:void(0);">...</a>
+                                                            </li>
+                                                        {% endif %}
+                                                        {% for left_page in left_pages %}
+                                                            <li>
+                                                                <a href="?p={{ left_page }}">{{ left_page }}</a>
+                                                            </li>
+                                                        {% endfor %}
+                                                        <li class="active"><a
+                                                                href="javascript:void(0);">{{ current_page }}</a>
+                                                        </li>
+                                                        {% for right_page in right_pages %}
+                                                            <li>
+                                                                <a href="?p={{ right_page }}">{{ right_page }}</a>
+                                                            </li>
+                                                        {% endfor %}
+                                                        {% if right_has_more %}
+                                                            <li class="disabled"><a href="javascript:void(0);">...</a>
+                                                            </li>
+                                                        {% endif %}
+                                                        {% if page_obj.has_next %}
+                                                            <li>
+                                                                <a href="?p={{ page_obj.next_page_number }}">&raquo;</a>
+                                                            </li>
+                                                        {% else %}
+                                                            <li class="disabled"><a
+                                                                    href="javascript:void(0);">&raquo;</a></li>
+                                                        {% endif %}
+                                                        <li class="paginate_button next" tabindex="-1">
+                                                            <a href="?p={{ num_pages }}">尾页</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="dataTables_paginate paging_simple_numbers">
+                                                    <ul class="pagination">
+                                                        <li>
+                                                            <div class="input-group">
+                                                                <input type="number" class="form-control"
+                                                                       name="page-skip" placeholder="页码">
+                                                                <span class="input-group-btn">
+                                                                    <button class="btn btn-primary" type="button"
+                                                                            id="skip-btn">跳转</button>
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-dialog" role="document">
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">排行榜</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nickname"> <span class="text-danger">*</span> 玩家昵称：</label>
+                        <input type="text" name="nickname" class="form-control" autocomplete="off" maxlength="20"
+                               placeholder="请输入玩家昵称，长度为2-20个字符">
+                    </div>
+                    <div class="form-group">
+                        <label for="game_name"> <span class="text-danger">*</span> 游戏名称：</label>
+                        <input type="text" name="game_name" class="form-control" autocomplete="off" maxlength="40"
+                               placeholder="请输入游戏名称，长度为2-40个字符">
+                    </div>
+                    <div class="form-group">
+                        <label for=""> <span class="text-danger">*</span> 游戏时长：</label>
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <input type="number" name="hour" class="form-control" autocomplete="off"
+                                       placeholder="0" style="width: 100px;" value="0">
+                                <label for="">时</label>
+                                <input type="number" name="minute" class="form-control" autocomplete="off"
+                                       placeholder="0" style="width: 100px;" value="0">
+                                <label for="">分</label>
+                                <input type="number" name="second" class="form-control" autocomplete="off"
+                                       placeholder="0" style="width: 100px;" value="0">
+                                <label for="">秒</label>
+                                <input type="number" name="millisecond" class="form-control" autocomplete="off"
+                                       placeholder="0" style="width: 120px;" value="000">
+                                <label for="">毫秒</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="platform"> <span class="text-danger">*</span> 游戏平台：</label>
+                        <select id="platform" class="form-control">
+                            <option value="1">游聚游戏平台</option>
+                            <option value="2">Nestopia模拟器</option>
+                            <option value="3">小霸王游戏机</option>
+                            <option value="0">其他</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-warning alert-dismissible" role="alert">
+                        <button type="button" tabindex="-1" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>提示：</strong><br>带有<strong> * </strong>的是必填项。
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="save-btn" class="btn btn-primary" data-dismiss="modal">
+                            <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+                            保存
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            关闭
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'vendor/metisMenu/metisMenu.min.js' %}"></script>
+    <script src="{% static 'dist/js/sb-admin-2.js' %}"></script>
+    <script src="{% static 'js/xfzajax.js' %}"></script>
+    <script src="{% static 'js/rank.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#dataTables-example').DataTable({
+                responsive: true
+            });
+        });
+    </script>
+</body>
+</html>
